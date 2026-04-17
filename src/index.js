@@ -1,7 +1,8 @@
 export default {
   async fetch(request, env, ctx) {
+    const originHost = env.ORIGIN_HOST || "bimsignbank-strapi.onrender.com";
     const url = new URL(request.url);
-    url.hostname = env.ORIGIN_HOST;
+    url.hostname = originHost;
 
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
@@ -14,7 +15,7 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    // Only cache safe GET requests
+    // Cache only safe GETs
     if (request.method === "GET") {
       const cache = caches.default;
       const cacheKey = new Request(request.url, request);
@@ -22,7 +23,6 @@ export default {
       // Try cache first
       let cached = await cache.match(cacheKey);
       if (cached) {
-        // You can add a custom header to confirm hits
         const hitHeaders = new Headers(cached.headers);
         hitHeaders.set("X-Worker-Cache", "HIT");
         return new Response(cached.body, {
@@ -36,13 +36,12 @@ export default {
       fwdHeaders.delete("host");
 
       const init = {
-        method: request.method,
+        method: "GET",
         headers: fwdHeaders,
       };
 
       const originResp = await fetch(url.toString(), init);
 
-      // Clone and add CORS / cache headers
       const respHeaders = new Headers(originResp.headers);
       for (const [k, v] of Object.entries(corsHeaders)) {
         respHeaders.set(k, v);
@@ -54,13 +53,18 @@ export default {
         headers: respHeaders,
       });
 
-      // Store in cache asynchronously
       ctx.waitUntil(cache.put(cacheKey, responseToCache.clone()));
 
-      return responseToCache;
+      const missHeaders = new Headers(responseToCache.headers);
+      missHeaders.set("X-Worker-Cache", "MISS");
+
+      return new Response(responseToCache.body, {
+        status: responseToCache.status,
+        headers: missHeaders,
+      });
     }
 
-    // Non-GET → just proxy through
+    // Non-GET → just proxy
     const fwdHeaders = new Headers(request.headers);
     fwdHeaders.delete("host");
 
