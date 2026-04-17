@@ -6,3 +6,6 @@ compatibility_date = "2024-04-17"
 [observability.logs]
 enabled = true
 invocation_logs = true
+
+[vars]
+ORIGIN_HOST = "bimsignbank-strapi.onrender.com"
