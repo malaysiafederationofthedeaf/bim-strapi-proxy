@@ -1,3 +1,8 @@
 name = "bim-strapi-proxy"
 main = "src/index.js"
 compatibility_date = "2024-04-17"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
