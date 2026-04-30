@@ -1,5 +1,4 @@
-// src/index.js
-var index_default = {
+export default {
   async fetch(request, env, ctx) {
     const originHost = env.ORIGIN_HOST || "bimsignbank-strapi.onrender.com";
 
@@ -9,7 +8,7 @@ var index_default = {
     // Detect cache bypass flag
     const bypassCache = url.searchParams.get("cf_bypass") === "1";
 
-    // (Optional) Strip cf_bypass before forwarding to Strapi
+    // Strip cf_bypass before forwarding to Strapi
     if (bypassCache) {
       url.searchParams.delete("cf_bypass");
     }
@@ -39,7 +38,7 @@ var index_default = {
       headers: fwdHeaders,
     };
 
-    // Only enable Cloudflare edge caching when NOT bypassing
+    // Only enable edge cache when NOT bypassing
     if (request.method === "GET" && !bypassCache) {
       init.cf = {
         cacheEverything: true,
