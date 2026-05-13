@@ -5,6 +5,8 @@ export default {
     const url = new URL(request.url);
     url.hostname = originHost;
 
+    const internalToken = env.RENDER_INTERNAL_TOKEN;
+
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",           // ok for public read-only API
       "Access-Control-Allow-Methods": "GET,OPTIONS",
@@ -21,6 +23,10 @@ export default {
     const fwdHeaders = new Headers(request.headers);
     fwdHeaders.delete("host");
     fwdHeaders.delete("origin");
+    fwdHeaders.delete("X-Internal-Token");
+    if(internalToken) {
+      fwdHeaders.set("X-Internal-Token", internalToken);
+    }
 
     const init = {
       method: request.method,
