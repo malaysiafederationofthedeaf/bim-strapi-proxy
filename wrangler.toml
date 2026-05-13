@@ -1,4 +1,4 @@
-name = "bim-strapi-proxy"
+name = "dev1-strapi-proxy"
 main = "src/index.js"
 compatibility_date = "2024-04-17"
 
