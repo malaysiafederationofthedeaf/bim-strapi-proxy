@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env, ctx) {
-    const originHost = env.ORIGIN_HOST;
+    const originHost = env.ORIGIN_HOST || "bimsignbank-strapi.onrender.com";
 
     const url = new URL(request.url);
     url.hostname = originHost;
